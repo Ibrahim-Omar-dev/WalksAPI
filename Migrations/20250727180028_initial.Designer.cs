@@ -12,7 +12,7 @@ using WalksAPI.Data;
 namespace WalksAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250725181012_initial")]
+    [Migration("20250727180028_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -55,6 +55,35 @@ namespace WalksAPI.Migrations
                             Id = new Guid("f808ddcd-b5e5-4d80-b732-1ca523e48434"),
                             Name = "Hard"
                         });
+                });
+
+            modelBuilder.Entity("WalksAPI.Models.Domain.Image", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FileDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("FileSizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("WalksAPI.Models.Domain.Region", b =>

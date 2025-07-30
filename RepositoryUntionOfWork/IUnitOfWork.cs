@@ -7,6 +7,7 @@ namespace WalksAPI.RepositoryUntionOfWork
     {
         IwalksRepositry WalksRepository { get; }
         IRegionRepository RegionRepository { get; }
+        IImageRepository ImageRepository { get; }
         Task SaveAsync();
     }
 }

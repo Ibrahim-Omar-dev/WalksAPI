@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using WalksAPI.Data;
 using WalksAPI.Mapping;
+using WalksAPI.MiddleWare;
 using WalksAPI.RepositoryUntionOfWork;
 using WalksAPI.RepositoryUntionOfWork.IRepositoryInterfaces;
 using WalksAPI.RepositoryUntionOfWork.Repository;
@@ -15,11 +18,22 @@ namespace WalksAPI
     {
         public static void Main(string[] args)
         {
+
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.File("Logs/Information.txt", rollingInterval: RollingInterval.Minute)
+                .Enrich.FromLogContext()
+                .CreateLogger();
+
+
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Logging.ClearProviders();
+            builder.Logging.AddSerilog();
             // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddHttpContextAccessor();
 
             // Configure dependency injection
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -151,7 +165,15 @@ namespace WalksAPI
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+         Path.Combine(builder.Environment.ContentRootPath, "images")),
+                RequestPath = "/images"
+            });
+            app.UseMiddleware<ExceptionHandleMiddleWare>();
             // Authentication middleware MUST come before Authorization
             app.UseAuthentication();
             app.UseAuthorization();

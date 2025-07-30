@@ -8,33 +8,36 @@ using WalksAPI.Validation;
 
 namespace WalksAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RegionsController : ControllerBase
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
-
-        public RegionsController(IUnitOfWork unitOfWork,IMapper mapper)
+        private readonly ILogger<RegionsController> logger;
+        public RegionsController(IUnitOfWork unitOfWork,IMapper mapper , ILogger<RegionsController> logger)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
+            this.logger = logger;
         }
         [HttpGet]
         [Route("GetAll")]
-        [Authorize(Roles = "Admin,User")]
+      //  [Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> GetAllRegions()
         {
+            //logger.LogInformation("GetAllRegions method called at {Time}", DateTime.UtcNow);
             var regions = await unitOfWork.RegionRepository.GetAllAsync();
             //convert to DTOs if necessary
-            var regionDto=mapper.Map<List<RegionDTO>>(regions);
+            // logger.LogInformation("Number of regions retrieved: {Count}", regions.Count);
 
+            var regionDto =mapper.Map<List<RegionDTO>>(regions);
             return Ok(regionDto);
         }
         [HttpGet]
         [Route("{id:Guid}")]
-        [Authorize(Roles = "Admin,User")]
+        //[Authorize(Roles = "Admin,User")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var region = await unitOfWork.RegionRepository.GetByIdAsync(id);
@@ -49,7 +52,7 @@ namespace WalksAPI.Controllers
         [HttpPost]
         [Route("Create")]
         [ValidateModel]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDTO addRegionRequestDTO)
         {
             //convert DTO to domain model
@@ -65,7 +68,7 @@ namespace WalksAPI.Controllers
         [HttpPut]
         [Route("{id:Guid}")]
         [ValidateModel]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update([FromRoute] Guid id,[FromBody] EditRegionREquestDTO editRegionREquestDTO)
         {
     
@@ -85,7 +88,7 @@ namespace WalksAPI.Controllers
         [HttpDelete]
         [Route("{id:guid}")]
         [ValidateModel]
-        [Authorize(Roles = "Admin")]
+   //     [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             var region = await unitOfWork.RegionRepository.GetByIdAsync(id);
@@ -96,6 +99,14 @@ namespace WalksAPI.Controllers
             await unitOfWork.RegionRepository.DeleteAsync(id);
             await unitOfWork.SaveAsync();
             return Ok(new { Message = "Region deleted successfully." });
+        }
+
+
+        [HttpGet]
+        [Route("TestException")]
+        public IActionResult ThrowError()
+        {
+            throw new Exception("Test global exception handling.");
         }
     }
 }
