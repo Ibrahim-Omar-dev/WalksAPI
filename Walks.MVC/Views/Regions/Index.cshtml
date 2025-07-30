@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Walks.MVC.Models.DTO.RegionDTO>
+
+@{
+	ViewData["Title"] = "Regions";
+}
+
+<table class="table table-bordered table-hover">
+	<div class="mt-3 text-end mb-3">
+		<a class="btn btn-info" asp-action="Create">Create New</a>
+	</div>
+	<thead>
+		<tr>
+			<th>Id</th>
+			<th>Region Name</th>
+			<th>Code</th>
+			<th>Region Image</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var region in Model)
+		{
+				<tr>
+					<td>@region.Id</td>
+					<td>@region.Name</td>
+					<td>@region.Code</td>
+					<td>
+						<img src="@region.RegionImageUrl" alt="Region Image" style="width:100px;height:100px;" />
+					</td>
+					<td>
+						<a asp-action="Edit" class="btn btn-primary" asp-route-id="@region.Id">Edit</a>
+					</td>
+				</tr>
+		}
+	</tbody>
+</table>
